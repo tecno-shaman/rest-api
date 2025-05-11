@@ -10,6 +10,7 @@ blueprint = flask.Blueprint(
     template_folder='templates'
 )
 
+
 @blueprint.route('/api/jobs')
 def get_jobs():
     db_sess = db_session.create_session()
@@ -20,6 +21,7 @@ def get_jobs():
                 [item.name for item in works]
         }
     )
+
 
 @blueprint.route('/api/jobs/<int:jobs_id>', methods=['GET'])
 def get_one_news(jobs_id):
@@ -33,6 +35,7 @@ def get_one_news(jobs_id):
         }
     )
 
+
 @blueprint.route('/api/jobs', methods=['POST'])
 def add_job():
     if not request.json:
@@ -40,17 +43,18 @@ def add_job():
     elif not 'name' in request.json:
         return make_response(jsonify({'error': 'Bad request'}), 400)
     db_sess = db_session.create_session()
-    job = Works(name = request.json['name'])
+    job = Works(name=request.json['name'])
     db_sess.add(job)
     db_sess.commit()
     return jsonify({'id': job.id})
 
-# @blueprint.route('/api/news/<int:news_id>', methods=['DELETE'])
-# def delete_news(news_id):
-#     db_sess = db_session.create_session()
-#     news = db_sess.query(Works).get(news_id)
-#     if not news:
-#         return make_response(jsonify({'error': 'Not found'}), 404)
-#     db_sess.delete(news)
-#     db_sess.commit()
-#     return jsonify({'success': 'OK'})
+
+@blueprint.route('/api/jobs/<int:job_id>', methods=['DELETE'])
+def delete_job(job_id):
+    db_sess = db_session.create_session()
+    works = db_sess.query(Works).get(job_id)
+    if not works:
+        return make_response(jsonify({'error': 'Not found'}), 404)
+    db_sess.delete(works)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})
